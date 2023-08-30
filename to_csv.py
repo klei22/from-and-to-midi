@@ -39,6 +39,9 @@ def midi_to_csv(midi_file_path, csv_file_path):
                         'pitch_bend': 0  # assuming no pitch bend
                     })
             elif msg.type == 'pitchwheel':
+                # This part assumes the pitch bend range is ±2 semitones, which is common but not universal.
+                # Adjust as needed based on your MIDI settings.
+                # pitch_bend_semitones = (msg.pitch / 8192.0) * 2
                 # If you need to handle pitch bends in the context of the ongoing notes, this part will need more logic.
                 pass
 
