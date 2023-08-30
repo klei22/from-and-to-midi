@@ -4,6 +4,28 @@ This repository contains Python scripts for converting MIDI files to CSV format
 and CSV files back to MIDI format. It utilizes the `mido` library for MIDI file
 handling.
 
+## TODO
+
+- [ ] if the velocity is zero for everything, then don't create the file
+- [ ] consider tokenization edits (see following section)
+
+## Tokenization
+
+- quantize the velocity (normalize first)
+- time
+    * remove excess precision from time (remove just enough decimals so it sounds good)
+    * remove the decimal of course (probably standardize to hundreths of a second)
+    * put the time into a higher base to accelerate quantization
+- pitch
+    * quantize the pitch into a higher base
+    * **base 12** so that it has automatic octaves (of course!)
+        + this will preserve the octave content automatically!
+    * Note: relative distance is ideal, but might depend on the tonic.
+- Velocity
+    * consider quantizing
+- Pitch bend
+    * consider removing the pitch_bend, or only using songs without this
+
 ## Requirements
 
 To run the scripts, you need to have the following dependencies installed:
