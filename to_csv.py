@@ -1,6 +1,7 @@
 import mido
-from mido import MidiFile
+from mido import MidiFile, MidiTrack, MetaMessage
 import csv
+import argparse
 
 def midi_to_csv(midi_file_path, csv_file_path):
     mid = MidiFile(midi_file_path)
@@ -13,6 +14,13 @@ def midi_to_csv(midi_file_path, csv_file_path):
 
         current_time_s = 0
         note_on_events = {}
+        
+        for track in mid.tracks:
+            for msg in track:
+                if msg.type == "set_tempo":
+                    # Extract tempo and save it to a file
+                    with open(f"{midi_file_path}.tempo", 'w') as tempo_file:
+                        tempo_file.write(str(msg.tempo))
 
         for msg in mid.play():
             current_time_s += msg.time
@@ -38,5 +46,17 @@ def midi_to_csv(midi_file_path, csv_file_path):
     print(f"Transcribed {midi_file_path} to {csv_file_path}")
 
 if __name__ == "__main__":
-    midi_to_csv('14MAxwar-Drillman.mid', 'output.csv')
+    parser = argparse.ArgumentParser(description='Transcribe MIDI file to CSV.')
+    parser.add_argument('-m', '--midi_file_path', type=str, required=True, help='Path to the input MIDI file.')
+    parser.add_argument('-c', '--csv_file_path', type=str, help='Path to the output CSV file.')
+
+    args = parser.parse_args()
+
+    csv_file_path = None
+    if args.csv_file_path==None:
+        csv_file_path = args.midi_file_path + ".csv"
+    else:
+        csv_file_path = args.csv_file_path
+
+    midi_to_csv(args.midi_file_path, csv_file_path)
 
