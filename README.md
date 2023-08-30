@@ -8,6 +8,8 @@ handling.
 
 - [ ] if the velocity is zero for everything, then don't create the file
 - [ ] consider tokenization edits (see following section)
+- [X] find out why velocity is zero, if not set to 50 by default.
+    - [X] seems to have fixed in the last update
 
 ## Tokenization
 
@@ -16,6 +18,11 @@ handling.
     * remove excess precision from time (remove just enough decimals so it sounds good)
     * remove the decimal of course (probably standardize to hundreths of a second)
     * put the time into a higher base to accelerate quantization
+    * consider putting start time and duration
+        + the duration will be the preprocessed difference of the start and end
+        + really wish we could just train the network to know how to take the
+            difference of the two times in high bases... might actualy be able
+            to try this to see if the loss decreases...
 - pitch
     * quantize the pitch into a higher base
     * **base 12** so that it has automatic octaves (of course!)
