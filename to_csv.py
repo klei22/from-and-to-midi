@@ -4,14 +4,14 @@ from mido import MidiFile, MidiTrack, MetaMessage
 import csv
 import argparse
 
-def midi_to_csv(midi_file_path, csv_file_path):
+def midi_to_csv(midi_file_path, csv_file_path, precision):
     mid = MidiFile(midi_file_path)
 
     with open(csv_file_path, 'w', newline='') as csvfile:
         fieldnames = ['start_time_s', 'end_time_s', 'pitch_midi', 'velocity', 'pitch_bend']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        writer.writeheader()
+        # writer.writeheader()
 
         current_time_s = 0
         note_on_events = {}
@@ -32,11 +32,11 @@ def midi_to_csv(midi_file_path, csv_file_path):
                 start_time, velocity = note_on_events.pop(msg.note, (None, 0))
                 if start_time is not None:
                     writer.writerow({
-                        'start_time_s': start_time,
-                        'end_time_s': current_time_s,
+                        'start_time_s': "{:.{}f}".format(start_time,precision),
+                        'end_time_s': "{:.{}f}".format(current_time_s,precision),
                         'pitch_midi': msg.note,
-                        'velocity': velocity,  # Using stored velocity
-                        'pitch_bend': 0  # assuming no pitch bend
+                        # 'velocity': velocity,  # Using stored velocity
+                        # 'pitch_bend': 0  # assuming no pitch bend
                     })
             elif msg.type == 'pitchwheel':
                 # This part assumes the pitch bend range is ±2 semitones, which is common but not universal.
@@ -53,6 +53,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Transcribe MIDI file to CSV.')
     parser.add_argument('-m', '--midi_file_path', type=str, required=True, help='Path to the input MIDI file.')
     parser.add_argument('-c', '--csv_file_path', type=str, help='Path to the output CSV file.')
+    parser.add_argument('-p', '--precision', type=int, default=3, help='precision of start and end times')
 
     args = parser.parse_args()
 
@@ -62,5 +63,5 @@ if __name__ == "__main__":
     else:
         csv_file_path = args.csv_file_path
 
-    midi_to_csv(args.midi_file_path, csv_file_path)
+    midi_to_csv(args.midi_file_path, csv_file_path, args.precision)
 

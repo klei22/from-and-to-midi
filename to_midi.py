@@ -23,17 +23,25 @@ def csv_to_midi(csv_file_path, midi_file_path, tempo_file_path=None):
     events = []
 
     with open(csv_file_path, 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
+        # reader = csv.DictReader(csvfile)
+        reader = csv.reader(csvfile)
 
         for row in reader:
-            start_time_s = float(row['start_time_s'])
-            end_time_s = float(row['end_time_s'])
-            pitch_midi = int(row['pitch_midi'])
-            velocity = int(row['velocity'])
-            
+            # start_time_s = float(row['start_time_s'])
+            # end_time_s = float(row['end_time_s'])
+            # pitch_midi = int(row['pitch_midi'])
+            # velocity = int(row['velocity'])
+            start_time_s = float(row[0])
+            end_time_s = float(row[1])
+            pitch_midi = 0
+            velocity = 110
+            # pitch_midi = int(row[2])
+            # velocity = int(row[3])
+            print(start_time_s, end_time_s, pitch_midi, velocity)
+
             events.append(('note_on', start_time_s, pitch_midi, velocity))
             events.append(('note_off', end_time_s, pitch_midi, velocity))
-            
+
     # Sort events by timestamp
     events.sort(key=lambda x: x[1])
 
@@ -43,27 +51,28 @@ def csv_to_midi(csv_file_path, midi_file_path, tempo_file_path=None):
 
         # Convert time from seconds to ticks
         delta_ticks = int((time_s - prev_time_s) * mid.ticks_per_beat)
-        
+
         if event_type == 'note_on':
             track.append(Message('note_on', note=pitch_midi, velocity=velocity, time=delta_ticks))
         elif event_type == 'note_off':
             track.append(Message('note_off', note=pitch_midi, velocity=velocity, time=delta_ticks))
-            
+
         prev_time_s = time_s
 
     mid.save(midi_file_path)
-    print(f"Converted {csv_file_path} to {midi_file_path}")
+    # print(f"Converted {} to {midi_file_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert a CSV representation of MIDI to an actual MIDI file.")
     parser.add_argument('-c', required=True, help="Input CSV file path.")
     parser.add_argument('-m', default=None, help="Output MIDI file path. If not specified, appends .mid to the CSV filename.")
     parser.add_argument('-t', default=None, help="Optional tempo file path.")
-    
+
     args = parser.parse_args()
 
     if not args.m:
         args.m = args.c + ".mid"
-    
+
+    print(args)
     csv_to_midi(args.c, args.m, args.t)
 
